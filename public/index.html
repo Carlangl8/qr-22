@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invitación a la fiesta</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Librería para generar QR en el navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- Librería para descargar la invitación como imagen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="main-header">
+        <h1>🎉 Fiesta 22 Carla 🎉</h1>
+        <p class="subtitle">
+          Guarda esta invitación o descárgala como imagen. El QR es tu invitación a la fiesta de Carla.
+        </p>
+      </header>
+
+      <!-- Modal para pedir el nombre -->
+      <div class="modal-backdrop" id="name-modal">
+        <div class="modal">
+          <h2>¿Cómo te llamas?</h2>
+          <p>Escribe tu nombre tal y como quieres que aparezca en la invitación.</p>
+          <form id="guest-form">
+            <input
+              type="text"
+              id="guest-name"
+              name="nombre"
+              placeholder="Ej. Juan Pérez"
+              autocomplete="name"
+              required
+            />
+            <button type="submit" class="btn primary">Generar invitación</button>
+          </form>
+          <p class="modal-hint">
+            Al confirmar se generará un QR único que usará el organizador para validar tu entrada.
+          </p>
+        </div>
+      </div>
+
+      <!-- Contenedor de la invitación generada -->
+      <main>
+        <section class="invitation-section" id="invitation-section" hidden>
+          <h2>Tu invitación personalizada</h2>
+
+          <div class="invitation-card-wrapper">
+            <div class="invitation-card" id="invitation-card">
+              <div class="invitation-header">
+                <span class="badge">INVITACIÓN</span>
+                <h3>Fiesta Temática Euphoria</h3>
+                <p>Te estaré esperando 🎊</p>
+              </div>
+
+              <div class="invitation-body">
+                <div class="invitation-info-row">
+                  <div class="invitation-info-left">
+                    <p class="label" id="invitation-label">Invitado/a:</p>
+                    <p class="guest-name" id="invited-name">Tu nombre aquí</p>
+                  </div>
+                  <div class="invitation-info-right">
+                    <p class="label">Código único:</p>
+                    <p class="guest-code" id="invited-code">—</p>
+                  </div>
+                </div>
+
+                <div class="qr-container">
+                  <canvas id="qr-canvas" width="180" height="180"></canvas>
+                </div>
+              </div>
+
+              <div class="invitation-footer">
+                <p>
+                  Muestra este QR al entrar. El organizador lo escaneará para confirmar tu asistencia.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="download-button" class="btn secondary">
+              Descargar invitación como imagen
+            </button>
+            <button id="new-invite-button" class="btn link">
+              Crear otra invitación
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="main-footer">
+        <p>
+          Panel de organización (admin):
+          <a href="admin.html">Escáner de invitaciones</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="guest.js"></script>
+  </body>
+</html>

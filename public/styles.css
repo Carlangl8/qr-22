@@ -1,0 +1,342 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #1a1a1a;
+  color: #f9fafb;
+  min-height: 100vh;
+}
+
+.page-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.main-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.main-header h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #d1d5db;
+  font-size: 0.95rem;
+}
+
+.main-footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.main-footer a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
+.main-footer a:hover {
+  text-decoration: underline;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal {
+  background: #000;
+  border-radius: 16px;
+  padding: 24px 22px 20px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.modal h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+
+.modal p {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  margin-bottom: 14px;
+}
+
+.modal-hint {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 10px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  background: #000;
+  color: #f9fafb;
+  outline: none;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+input[type="text"]::placeholder {
+  color: #9ca3af;
+}
+
+input[type="text"]:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 9px 16px;
+  transition: all 0.15s ease-out;
+  gap: 6px;
+}
+
+.btn.primary {
+  background: #7c3aed;
+  color: #fff;
+  width: 100%;
+}
+
+.btn.primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+}
+
+.btn.secondary:hover {
+  background: #020617;
+  border-color: #38bdf8;
+  color: #f9fafb;
+}
+
+.btn.link {
+  background: transparent;
+  color: #9ca3af;
+  padding-inline: 4px;
+}
+
+.btn.link:hover {
+  color: #e5e7eb;
+}
+
+.invitation-section {
+  margin-top: 12px;
+}
+
+.invitation-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.section-hint {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  margin-bottom: 18px;
+}
+
+.invitation-card-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.invitation-card {
+  width: min(320px, 100%);
+  aspect-ratio: 3 / 4;
+  border-radius: 22px;
+  padding: 18px 18px 14px;
+  background: url("assets/entrada-base.png") center/cover no-repeat;
+  background-color: #000;
+  border: 1px solid rgba(248, 250, 252, 0.15);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Overlay muy suave solo abajo para leer nombre y QR, sin oscurecer el 22 y el fondo */
+.invitation-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 40%, transparent 70%);
+  pointer-events: none;
+}
+
+.invitation-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.invitation-info-left {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.invitation-info-right {
+  flex: 1;
+  text-align: right;
+  min-width: 0;
+}
+
+.invitation-info-right .label {
+  margin-bottom: 2px;
+}
+
+.invitation-info-right .guest-code {
+  margin-bottom: 0;
+}
+
+.invitation-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-size: 0.7rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+  margin-bottom: 4px;
+}
+
+.invitation-header h3 {
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+  color: #fff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 1px 4px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.invitation-header p {
+  font-size: 0.9rem;
+  color: #fff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 1px 4px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.invitation-body {
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #fff;
+  margin-bottom: 2px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 1px 4px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.guest-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 1px 4px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.guest-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 2px;
+  margin-top: auto;
+  margin-bottom: 4px;
+}
+
+.invitation-footer {
+  margin-top: 6px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 1), 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .page-wrapper {
+    padding-inline: 14px;
+  }
+
+  .invitation-card {
+    padding-inline: 14px;
+  }
+}
+

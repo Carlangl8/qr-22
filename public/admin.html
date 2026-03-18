@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel admin - Escanear invitados</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+      .admin-wrapper {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+      .admin-card {
+        margin-top: 16px;
+        padding: 18px 18px 14px;
+        border-radius: 18px;
+        background: #000000;
+        border: 1px solid rgba(252, 252, 252, 0.5);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      }
+      #reader {
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto;
+      }
+      #resultado {
+        margin-top: 14px;
+        text-align: center;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-wrapper">
+      <header class="main-header">
+        <h1>Escanear QR de invitados</h1>
+        <p class="subtitle">
+          Apunta la cámara al QR de la invitación para marcar la asistencia del invitado.
+        </p>
+      </header>
+
+      <main>
+        <section class="admin-card">
+          <div id="reader"></div>
+          <h2 id="resultado"></h2>
+        </section>
+      </main>
+
+      <footer class="main-footer">
+        <p>
+          Página de invitado:
+          <a href="index.html">Volver a la página pública</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
