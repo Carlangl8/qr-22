@@ -1,6 +1,6 @@
 function onScanSuccess(decodedText) {
   // El QR contiene el código único del invitado
-  fetch("/scan", {
+  fetch("/api/scan", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
