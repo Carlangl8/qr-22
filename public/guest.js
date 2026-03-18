@@ -71,10 +71,21 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ nombre }),
       });
 
-      const data = await respuesta.json();
+      // Si el servidor devuelve HTML por un 500, `respuesta.json()` rompe.
+      let data = null;
+      let rawText = null;
+      try {
+        data = await respuesta.json();
+      } catch {
+        rawText = await respuesta.text();
+      }
 
-      if (!respuesta.ok || !data.ok) {
-        alert(data.mensaje || "No se pudo crear la invitación. Intenta de nuevo.");
+      if (!respuesta.ok || (data && !data.ok)) {
+        const mensaje =
+          (data && data.mensaje) ||
+          (rawText ? rawText.slice(0, 200) : null) ||
+          "No se pudo crear la invitación. Intenta de nuevo.";
+        alert(mensaje);
         return;
       }
 

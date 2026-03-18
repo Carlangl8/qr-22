@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
 const app = express();
 
@@ -10,7 +11,11 @@ app.use(express.json());
 const PUBLIC_DIR = path.join(__dirname, "public");
 app.use(express.static(PUBLIC_DIR));
 
-const DATA_FILE = path.join(__dirname, "invitados.json");
+const isVercel = !!process.env.VERCEL;
+// En Vercel el FS del proyecto suele ser read-only.
+const DATA_FILE = isVercel
+  ? path.join(os.tmpdir(), "invitados.json")
+  : path.join(__dirname, "invitados.json");
 
 let invitados = [];
 
@@ -29,7 +34,12 @@ function cargarInvitados() {
 }
 
 function guardarInvitados() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(invitados, null, 2), "utf8");
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(invitados, null, 2), "utf8");
+  } catch (err) {
+    console.error("Error guardando invitados.json:", err);
+    throw err;
+  }
 }
 
 function generarCodigoUnico() {
@@ -43,32 +53,40 @@ cargarInvitados();
 
 // API para crear invitación de invitado
 app.post("/api/invitados", (req, res) => {
-  const { nombre } = req.body || {};
+  try {
+    const { nombre } = req.body || {};
 
-  if (!nombre || typeof nombre !== "string" || !nombre.trim()) {
-    return res.status(400).json({
+    if (!nombre || typeof nombre !== "string" || !nombre.trim()) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "El nombre es obligatorio",
+      });
+    }
+
+    const codigo = generarCodigoUnico();
+
+    const invitado = {
+      id: invitados.length + 1,
+      nombre: nombre.trim(),
+      codigo,
+      llegado: false,
+      creadoEn: new Date().toISOString(),
+    };
+
+    invitados.push(invitado);
+    guardarInvitados();
+
+    return res.json({
+      ok: true,
+      invitado,
+    });
+  } catch (err) {
+    console.error("Error creando invitación:", err);
+    return res.status(500).json({
       ok: false,
-      mensaje: "El nombre es obligatorio",
+      mensaje: "Error interno al crear la invitación",
     });
   }
-
-  const codigo = generarCodigoUnico();
-
-  const invitado = {
-    id: invitados.length + 1,
-    nombre: nombre.trim(),
-    codigo,
-    llegado: false,
-    creadoEn: new Date().toISOString(),
-  };
-
-  invitados.push(invitado);
-  guardarInvitados();
-
-  res.json({
-    ok: true,
-    invitado,
-  });
 });
 
 // API para obtener datos de invitado por código (útil si luego quieres una página /invitacion.html)
@@ -95,40 +113,47 @@ app.get("/api/invitados/:codigo", (req, res) => {
 
 // Endpoint que usa el admin al escanear el QR
 app.post("/scan", (req, res) => {
-  // Nuevo formato: enviamos `codigo` en el cuerpo.
-  // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
-  const codigoQR = req.body.codigo || req.body.nombre;
+  try {
+    // Nuevo formato: enviamos `codigo` en el cuerpo.
+    // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
+    const codigoQR = req.body.codigo || req.body.nombre;
 
-  if (!codigoQR) {
-    return res.status(400).json({
-      mensaje: "No se recibió código de invitado",
-    });
-  }
+    if (!codigoQR) {
+      return res.status(400).json({
+        mensaje: "No se recibió código de invitado",
+      });
+    }
 
-  const invitado =
-    invitados.find((i) => i.codigo === codigoQR) ||
-    invitados.find((i) => i.nombre === codigoQR);
+    const invitado =
+      invitados.find((i) => i.codigo === codigoQR) ||
+      invitados.find((i) => i.nombre === codigoQR);
 
-  if (!invitado) {
+    if (!invitado) {
+      return res.json({
+        mensaje: "❌ No está en la lista",
+      });
+    }
+
+    if (invitado.llegado) {
+      return res.json({
+        mensaje: "⚠️ Ya había entrado",
+      });
+    }
+
+    invitado.llegado = true;
+    invitado.llegadoEn = new Date().toISOString();
+    guardarInvitados();
+
     return res.json({
-      mensaje: "❌ No está en la lista",
+      mensaje: "✅ Bienvenido " + invitado.nombre,
+      invitado,
+    });
+  } catch (err) {
+    console.error("Error en /scan:", err);
+    return res.status(500).json({
+      mensaje: "Error interno al procesar el escaneo",
     });
   }
-
-  if (invitado.llegado) {
-    return res.json({
-      mensaje: "⚠️ Ya había entrado",
-    });
-  }
-
-  invitado.llegado = true;
-  invitado.llegadoEn = new Date().toISOString();
-  guardarInvitados();
-
-  res.json({
-    mensaje: "✅ Bienvenido " + invitado.nombre,
-    invitado,
-  });
 });
 
 // Exportamos la app para que Vercel pueda usarla

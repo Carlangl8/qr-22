@@ -1,8 +1,14 @@
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
-// Usamos la raíz del proyecto como en `server.js`
-const DATA_FILE = path.join(process.cwd(), "invitados.json");
+const isVercel = !!process.env.VERCEL;
+
+// En Vercel el sistema de archivos del proyecto suele ser read-only.
+// Usamos `/tmp` para que `guardarInvitados()` funcione.
+const DATA_FILE = isVercel
+  ? path.join(os.tmpdir(), "invitados.json")
+  : path.join(process.cwd(), "invitados.json");
 
 let invitados = [];
 
@@ -33,40 +39,70 @@ function generarCodigoUnico() {
 // Cargamos los invitados la primera vez que se importe la función
 cargarInvitados();
 
-module.exports = (req, res) => {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({
-      ok: false,
-      mensaje: "Método no permitido",
+function leerBody(req) {
+  return new Promise((resolve, reject) => {
+    let datos = "";
+    req.on("data", (chunk) => {
+      datos += chunk;
     });
-  }
-
-  const { nombre } = req.body || {};
-
-  if (!nombre || typeof nombre !== "string" || !nombre.trim()) {
-    return res.status(400).json({
-      ok: false,
-      mensaje: "El nombre es obligatorio",
-    });
-  }
-
-  const codigo = generarCodigoUnico();
-
-  const invitado = {
-    id: invitados.length + 1,
-    nombre: nombre.trim(),
-    codigo,
-    llegado: false,
-    creadoEn: new Date().toISOString(),
-  };
-
-  invitados.push(invitado);
-  guardarInvitados();
-
-  return res.status(200).json({
-    ok: true,
-    invitado,
+    req.on("end", () => resolve(datos));
+    req.on("error", reject);
   });
+}
+
+module.exports = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST");
+      return res.status(405).json({
+        ok: false,
+        mensaje: "Método no permitido",
+      });
+    }
+
+    let body = req.body;
+    // En Vercel algunas configuraciones pueden no parsear `req.body`.
+    if (!body || typeof body !== "object") {
+      const raw = await leerBody(req);
+      try {
+        body = raw ? JSON.parse(raw) : {};
+      } catch {
+        body = {};
+      }
+    }
+
+    const { nombre } = body || {};
+
+    if (!nombre || typeof nombre !== "string" || !nombre.trim()) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "El nombre es obligatorio",
+      });
+    }
+
+    const codigo = generarCodigoUnico();
+
+    const invitado = {
+      id: invitados.length + 1,
+      nombre: nombre.trim(),
+      codigo,
+      llegado: false,
+      creadoEn: new Date().toISOString(),
+    };
+
+    invitados.push(invitado);
+    guardarInvitados();
+
+    return res.status(200).json({
+      ok: true,
+      invitado,
+    });
+  } catch (err) {
+    console.error("Error en /api/invitados:", err);
+    return res.status(500).json({
+      ok: false,
+      mensaje: "Error interno al crear la invitación",
+    });
+  }
 };
 

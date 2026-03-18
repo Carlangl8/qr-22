@@ -1,8 +1,13 @@
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
-// Usamos la raíz del proyecto para compartir el mismo fichero que el servidor local
-const DATA_FILE = path.join(process.cwd(), "invitados.json");
+const isVercel = !!process.env.VERCEL;
+
+// Usamos `/tmp` en Vercel porque el FS del proyecto suele ser read-only.
+const DATA_FILE = isVercel
+  ? path.join(os.tmpdir(), "invitados.json")
+  : path.join(process.cwd(), "invitados.json");
 
 let invitados = [];
 
@@ -27,47 +32,75 @@ function guardarInvitados() {
 // Cargamos los invitados la primera vez que se importe la función
 cargarInvitados();
 
-module.exports = (req, res) => {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({
-      mensaje: "Método no permitido",
+function leerBody(req) {
+  return new Promise((resolve, reject) => {
+    let datos = "";
+    req.on("data", (chunk) => {
+      datos += chunk;
     });
-  }
-
-  // Nuevo formato: enviamos `codigo` en el cuerpo.
-  // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
-  const codigoQR = (req.body && (req.body.codigo || req.body.nombre)) || null;
-
-  if (!codigoQR) {
-    return res.status(400).json({
-      mensaje: "No se recibió código de invitado",
-    });
-  }
-
-  const invitado =
-    invitados.find((i) => i.codigo === codigoQR) ||
-    invitados.find((i) => i.nombre === codigoQR);
-
-  if (!invitado) {
-    return res.status(200).json({
-      mensaje: "❌ No está en la lista",
-    });
-  }
-
-  if (invitado.llegado) {
-    return res.status(200).json({
-      mensaje: "⚠️ Ya había entrado",
-    });
-  }
-
-  invitado.llegado = true;
-  invitado.llegadoEn = new Date().toISOString();
-  guardarInvitados();
-
-  return res.status(200).json({
-    mensaje: "✅ Bienvenido " + invitado.nombre,
-    invitado,
+    req.on("end", () => resolve(datos));
+    req.on("error", reject);
   });
+}
+
+module.exports = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST");
+      return res.status(405).json({
+        mensaje: "Método no permitido",
+      });
+    }
+
+    // Nuevo formato: enviamos `codigo` en el cuerpo.
+    // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
+    let body = req.body;
+    if (!body || typeof body !== "object") {
+      const raw = await leerBody(req);
+      try {
+        body = raw ? JSON.parse(raw) : {};
+      } catch {
+        body = {};
+      }
+    }
+
+    const codigoQR = (body && (body.codigo || body.nombre)) || null;
+
+    if (!codigoQR) {
+      return res.status(400).json({
+        mensaje: "No se recibió código de invitado",
+      });
+    }
+
+    const invitado =
+      invitados.find((i) => i.codigo === codigoQR) ||
+      invitados.find((i) => i.nombre === codigoQR);
+
+    if (!invitado) {
+      return res.status(200).json({
+        mensaje: "❌ No está en la lista",
+      });
+    }
+
+    if (invitado.llegado) {
+      return res.status(200).json({
+        mensaje: "⚠️ Ya había entrado",
+      });
+    }
+
+    invitado.llegado = true;
+    invitado.llegadoEn = new Date().toISOString();
+    guardarInvitados();
+
+    return res.status(200).json({
+      mensaje: "✅ Bienvenido " + invitado.nombre,
+      invitado,
+    });
+  } catch (err) {
+    console.error("Error en /api/scan:", err);
+    return res.status(500).json({
+      mensaje: "Error interno al procesar el escaneo",
+    });
+  }
 };
 
