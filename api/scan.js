@@ -1,36 +1,4 @@
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-
-const isVercel = !!process.env.VERCEL;
-
-// Usamos `/tmp` en Vercel porque el FS del proyecto suele ser read-only.
-const DATA_FILE = isVercel
-  ? path.join(os.tmpdir(), "invitados.json")
-  : path.join(process.cwd(), "invitados.json");
-
-let invitados = [];
-
-function cargarInvitados() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const contenido = fs.readFileSync(DATA_FILE, "utf8");
-      invitados = contenido ? JSON.parse(contenido) : [];
-    } else {
-      invitados = [];
-    }
-  } catch (err) {
-    console.error("Error leyendo invitados.json:", err);
-    invitados = [];
-  }
-}
-
-function guardarInvitados() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(invitados, null, 2), "utf8");
-}
-
-// Cargamos los invitados la primera vez que se importe la función
-cargarInvitados();
+const { supabase } = require('../lib/supabase');
 
 function leerBody(req) {
   return new Promise((resolve, reject) => {
@@ -52,8 +20,6 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Nuevo formato: enviamos `codigo` en el cuerpo.
-    // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
     let body = req.body;
     if (!body || typeof body !== "object") {
       const raw = await leerBody(req);
@@ -72,29 +38,43 @@ module.exports = async (req, res) => {
       });
     }
 
-    const invitado =
-      invitados.find((i) => i.codigo === codigoQR) ||
-      invitados.find((i) => i.nombre === codigoQR);
+    const { data: invitadoBusqueda, error: searchError } = await supabase
+      .from('invitados')
+      .select('*')
+      .or(`Code.eq.${codigoQR},name.eq.${codigoQR}`);
 
-    if (!invitado) {
+    if (searchError) throw searchError;
+
+    if (!invitadoBusqueda || invitadoBusqueda.length === 0) {
       return res.status(200).json({
-        mensaje: "❌ No está en la lista",
+        mensaje: "❌ No está en la lista: " + (codigoQR || ""),
       });
     }
 
-    if (invitado.llegado) {
+    const invitado = invitadoBusqueda[0];
+
+    if (invitado.arrived) {
       return res.status(200).json({
         mensaje: "⚠️ Ya había entrado",
       });
     }
 
-    invitado.llegado = true;
-    invitado.llegadoEn = new Date().toISOString();
-    guardarInvitados();
+    const { error: updateError } = await supabase
+      .from('invitados')
+      .update({ arrived: true })
+      .eq('id', invitado.id);
+
+    if (updateError) throw updateError;
 
     return res.status(200).json({
-      mensaje: "✅ Bienvenido " + invitado.nombre,
-      invitado,
+      mensaje: "✅ Bienvenido " + invitado.name,
+      invitado: {
+        id: invitado.id,
+        nombre: invitado.name,
+        codigo: invitado.Code,
+        llegado: true,
+        creadoEn: invitado.created_at,
+      },
     });
   } catch (err) {
     console.error("Error en /api/scan:", err);

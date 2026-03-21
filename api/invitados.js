@@ -1,43 +1,10 @@
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-
-const isVercel = !!process.env.VERCEL;
-
-// En Vercel el sistema de archivos del proyecto suele ser read-only.
-// Usamos `/tmp` para que `guardarInvitados()` funcione.
-const DATA_FILE = isVercel
-  ? path.join(os.tmpdir(), "invitados.json")
-  : path.join(process.cwd(), "invitados.json");
-
-let invitados = [];
-
-function cargarInvitados() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const contenido = fs.readFileSync(DATA_FILE, "utf8");
-      invitados = contenido ? JSON.parse(contenido) : [];
-    } else {
-      invitados = [];
-    }
-  } catch (err) {
-    console.error("Error leyendo invitados.json:", err);
-    invitados = [];
-  }
-}
-
-function guardarInvitados() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(invitados, null, 2), "utf8");
-}
+const { supabase } = require('../lib/supabase');
 
 function generarCodigoUnico() {
   const base = Date.now().toString(36);
   const rnd = Math.random().toString(36).substring(2, 8);
   return `${base}${rnd}`.toUpperCase();
 }
-
-// Cargamos los invitados la primera vez que se importe la función
-cargarInvitados();
 
 function leerBody(req) {
   return new Promise((resolve, reject) => {
@@ -53,9 +20,25 @@ function leerBody(req) {
 module.exports = async (req, res) => {
   try {
     if (req.method === "GET") {
+      const { data: invitados, error } = await supabase
+        .from('invitados')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      const mappedInvitados = (invitados || []).map(i => ({
+        id: i.id,
+        nombre: i.name,
+        codigo: i.Code,
+        llegado: i.arrived,
+        creadoEn: i.created_at,
+        llegadoEn: i.created_at // Compatibilidad
+      }));
+
       return res.status(200).json({
         ok: true,
-        invitados,
+        invitados: mappedInvitados,
       });
     }
 
@@ -68,7 +51,6 @@ module.exports = async (req, res) => {
     }
 
     let body = req.body;
-    // En Vercel algunas configuraciones pueden no parsear `req.body`.
     if (!body || typeof body !== "object") {
       const raw = await leerBody(req);
       try {
@@ -89,26 +71,33 @@ module.exports = async (req, res) => {
 
     const codigo = generarCodigoUnico();
 
-    const invitado = {
-      id: invitados.length + 1,
-      nombre: nombre.trim(),
-      codigo,
-      llegado: false,
-      creadoEn: new Date().toISOString(),
-    };
+    const { data: inserted, error: insertError } = await supabase
+      .from('invitados')
+      .insert([
+        { name: nombre.trim(), Code: codigo, arrived: false }
+      ])
+      .select()
+      .single();
 
-    invitados.push(invitado);
-    guardarInvitados();
+    if (insertError) throw insertError;
+
+    const invitadoFront = {
+      id: inserted.id,
+      nombre: inserted.name,
+      codigo: inserted.Code,
+      llegado: inserted.arrived,
+      creadoEn: inserted.created_at,
+    };
 
     return res.status(200).json({
       ok: true,
-      invitado,
+      invitado: invitadoFront,
     });
   } catch (err) {
     console.error("Error en /api/invitados:", err);
     return res.status(500).json({
       ok: false,
-      mensaje: "Error interno al crear la invitación",
+      mensaje: "Error interno al procesar la invitación",
     });
   }
 };
