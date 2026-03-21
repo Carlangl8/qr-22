@@ -52,8 +52,15 @@ function leerBody(req) {
 
 module.exports = async (req, res) => {
   try {
+    if (req.method === "GET") {
+      return res.status(200).json({
+        ok: true,
+        invitados,
+      });
+    }
+
     if (req.method !== "POST") {
-      res.setHeader("Allow", "POST");
+      res.setHeader("Allow", "GET, POST");
       return res.status(405).json({
         ok: false,
         mensaje: "Método no permitido",
