@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
     }
 
     const { data: invitadoBusqueda, error: searchError } = await supabase
-      .from('invitados')
+      .from('Users')
       .select('*')
       .or(`Code.eq.${codigoQR},name.eq.${codigoQR}`);
 
@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
     }
 
     const { error: updateError } = await supabase
-      .from('invitados')
+      .from('Users')
       .update({ arrived: true })
       .eq('id', invitado.id);
 

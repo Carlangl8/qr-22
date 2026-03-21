@@ -25,7 +25,7 @@ app.get("/api/invitados/:codigo", async (req, res) => {
 
   try {
     const { data: invitado, error } = await supabase
-      .from('invitados')
+      .from('Users')
       .select('*')
       .or(`Code.eq.${codigo},name.eq.${codigo}`)
       .limit(1)

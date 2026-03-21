@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
   try {
     if (req.method === "GET") {
       const { data: invitados, error } = await supabase
-        .from('invitados')
+        .from('Users')
         .select('*')
         .order('created_at', { ascending: true });
 
@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
     const codigo = generarCodigoUnico();
 
     const { data: inserted, error: insertError } = await supabase
-      .from('invitados')
+      .from('Users')
       .insert([
         { name: nombre.trim(), Code: codigo, arrived: false }
       ])
