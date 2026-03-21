@@ -1,4 +1,5 @@
 function onScanSuccess(decodedText) {
+  const cleanCode = decodedText ? decodedText.trim() : "";
   // El QR contiene el código único del invitado
   fetch("/api/scan", {
     method: "POST",
@@ -6,7 +7,7 @@ function onScanSuccess(decodedText) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      codigo: decodedText,
+      codigo: cleanCode,
     }),
   })
     .then(async (res) => {

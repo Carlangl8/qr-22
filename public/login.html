@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acceso Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .login-card {
+        background: rgba(15, 10, 25, 0.8);
+        border: 1px solid rgba(192, 38, 211, 0.5);
+        border-radius: 20px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        text-align: center;
+        box-shadow: 0 0 40px rgba(124, 58, 237, 0.4), 0 0 80px rgba(192, 38, 211, 0.2);
+    }
+    .login-card h2 {
+        color: #fff;
+        margin-bottom: 24px;
+        font-family: 'Outfit', sans-serif;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        color: #c4b5fd;
+        margin-bottom: 8px;
+        font-family: 'Outfit', sans-serif;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(124, 58, 237, 0.5);
+        background: rgba(0, 0, 0, 0.3);
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        box-sizing: border-box;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #c026d3;
+        box-shadow: 0 0 10px rgba(192, 38, 211, 0.3);
+    }
+    .error-msg {
+        color: #ef4444;
+        margin-top: 16px;
+        display: none;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <h2>Acceso a Ajustes</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <input type="text" id="username" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn primary" style="width: 100%; margin-top: 8px;">Entrar</button>
+        <p class="error-msg" id="error-msg">Credenciales incorrectas</p>
+      </form>
+      <div style="margin-top: 24px;">
+        <a href="index.html" style="color: #c4b5fd; text-decoration: none; font-family: 'Outfit', sans-serif;">← Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+  <script src="login.js"></script>
+</body>
+</html>

@@ -51,6 +51,16 @@ function generarCodigoUnico() {
 // Cargar invitados al iniciar el servidor
 cargarInvitados();
 
+// API para login de admin
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body || {};
+  if (username === "carlangl" && password === "Carlayuhai8") {
+    return res.json({ ok: true, token: "admin-token-22" });
+  } else {
+    return res.status(401).json({ ok: false, mensaje: "Credenciales incorrectas" });
+  }
+});
+
 // API para crear invitación de invitado
 app.post("/api/invitados", (req, res) => {
   try {
@@ -89,6 +99,14 @@ app.post("/api/invitados", (req, res) => {
   }
 });
 
+// API para obtener todos los invitados
+app.get("/api/invitados", (req, res) => {
+  res.json({
+    ok: true,
+    invitados,
+  });
+});
+
 // API para obtener datos de invitado por código (útil si luego quieres una página /invitacion.html)
 app.get("/api/invitados/:codigo", (req, res) => {
   const { codigo } = req.params;
@@ -112,11 +130,12 @@ app.get("/api/invitados/:codigo", (req, res) => {
 });
 
 // Endpoint que usa el admin al escanear el QR
-app.post("/scan", (req, res) => {
+app.post("/api/scan", (req, res) => {
   try {
     // Nuevo formato: enviamos `codigo` en el cuerpo.
     // Compatibilidad: si sólo viene `nombre`, seguimos intentando buscar por nombre.
-    const codigoQR = req.body.codigo || req.body.nombre;
+    const codigoQR = (req.body.codigo || req.body.nombre || "").trim();
+    console.log("QR Escaneado:", codigoQR);
 
     if (!codigoQR) {
       return res.status(400).json({
@@ -126,11 +145,12 @@ app.post("/scan", (req, res) => {
 
     const invitado =
       invitados.find((i) => i.codigo === codigoQR) ||
-      invitados.find((i) => i.nombre === codigoQR);
+      invitados.find((i) => i.nombre.toLowerCase() === codigoQR.toLowerCase());
 
     if (!invitado) {
+      console.log("Invitado no encontrado para el escaneo:", codigoQR);
       return res.json({
-        mensaje: "❌ No está en la lista",
+        mensaje: "❌ No está en la lista: " + codigoQR,
       });
     }
 

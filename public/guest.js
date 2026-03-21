@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       modal.style.display = "none";
       mostrarInvitacion(data.invitado);
+      sessionStorage.setItem("invitado", JSON.stringify(data.invitado));
     } catch (error) {
       console.error("Error al crear invitación:", error);
       alert("Ocurrió un error al crear la invitación. Revisa el servidor e inténtalo otra vez.");
@@ -123,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   newInviteButton.addEventListener("click", () => {
     invitadoActual = null;
+    sessionStorage.removeItem("invitado");
     invitationSection.hidden = true;
     nameInput.value = "";
     invitationLabelEl.textContent = "Invitado/a:";
@@ -130,8 +132,20 @@ document.addEventListener("DOMContentLoaded", () => {
     nameInput.focus();
   });
 
-  // Mostrar el modal al entrar en la página
-  modal.style.display = "flex";
-  nameInput.focus();
+  // Mostrar el modal o la invitación guardada al entrar
+  const invitadoGuardado = sessionStorage.getItem("invitado");
+  if (invitadoGuardado) {
+    try {
+      const invitado = JSON.parse(invitadoGuardado);
+      modal.style.display = "none";
+      mostrarInvitacion(invitado);
+    } catch (e) {
+      modal.style.display = "flex";
+      nameInput.focus();
+    }
+  } else {
+    modal.style.display = "flex";
+    nameInput.focus();
+  }
 });
 
