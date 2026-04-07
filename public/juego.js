@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const btn = document.createElement("button");
                     btn.className = "btn";
                     btn.textContent = g.nombre;
+                    btn.dataset.name = g.nombre;
                     btn.style.width = "100%";
                     btn.style.height = "100px";
                     btn.style.fontSize = "1.1rem";
@@ -151,7 +152,15 @@ document.addEventListener("DOMContentLoaded", () => {
         
         questionBadge.textContent = "Pregunta " + (expectedQuestionIndex + 1);
         questionText.textContent = qText;
-        guestSelect.selectedIndex = 0; // reset
+        
+        // Restaurar estado de los botones
+        const buttons = document.querySelectorAll("#guests-grid .btn");
+        buttons.forEach(btn => {
+            btn.style.transform = "none";
+            if (btn.dataset.name) {
+                btn.textContent = btn.dataset.name;
+            }
+        });
     }
 
     function showWaitingNext() {
