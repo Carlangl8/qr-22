@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euphoria Awards - Partida</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .player-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .big-input {
+            font-size: 1.5rem;
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .lobby-wait {
+            margin-top: 50px;
+            font-size: 1.2rem;
+            color: #d8b4fe;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper player-wrapper">
+        <header class="main-header" style="margin-bottom: 20px;">
+            <h1 style="font-size: 2rem;">Game Options</h1>
+        </header>
+
+        <!-- PANTALLA 1: Unirse -->
+        <div id="screen-join" style="margin-top: 30px;">
+            <div class="invitation-card" style="width: 100%;">
+                <div class="invitation-body">
+                    <input type="text" id="input-pin" class="big-input" placeholder="PIN DEL JUEGO" maxlength="4" style="text-transform: uppercase;">
+                    <input type="text" id="input-name" class="big-input" placeholder="TU NOMBRE (NICKNAME)" style="letter-spacing: normal;">
+                </div>
+                <div class="actions">
+                    <button id="btn-join" class="btn primary" style="font-size: 1.2rem; width: 100%;">Entrar al Juego</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: Lobby de espera -->
+        <div id="screen-lobby" style="display: none;">
+            <h2 style="color: #fff; text-shadow: 0 0 10px #c026d3;">¡Estás dentro, <span id="display-name" style="color: #e879f9;"></span>!</h2>
+            <div class="lobby-wait">Esperando a que el anfitrión inicie...</div>
+        </div>
+
+        <!-- PANTALLA 3: Pregunta y votación -->
+        <div id="screen-question" style="display: none; margin-top: 20px;">
+            <div class="badge" id="question-badge">Pregunta</div>
+            <h2 style="color: #fff; font-size: 1.6rem; margin: 15px 0 25px; text-shadow: 0 0 8px #c026d3;" id="question-text">Cargando...</h2>
+            
+            <div style="width: 100%;">
+                <div id="guests-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px;">
+                    <!-- Botones inyectados aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 4: Voto enviado / esperando -->
+        <div id="screen-waiting-next" style="display: none;">
+            <h2 style="color: #fff; margin-top: 40px;">¡Voto Enviado! 📩</h2>
+            <div class="lobby-wait">Atento a la pantalla grande. Esperando siguiente pregunta...</div>
+        </div>
+        
+        <!-- PANTALLA 5: Fin -->
+        <div id="screen-finished" style="display: none;">
+            <h2 style="color: #fff; margin-top: 40px; text-shadow: 0 0 10px #c026d3;">¡Juego Terminado!</h2>
+            <p style="color: #d8b4fe; margin-top: 20px;">Mira el ranking en la pantalla grande.</p>
+            <div style="margin-top: 40px;">
+                <a href="index.html" class="btn secondary">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="juego.js"></script>
+</body>
+</html>

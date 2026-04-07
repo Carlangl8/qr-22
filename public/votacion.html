@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euphoria Awards - Votación</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="main-header">
+            <h1>Euphoria Awards</h1>
+            <p class="subtitle">Vota y descubre quién gana en cada categoría</p>
+        </header>
+
+        <div style="text-align: center; margin-bottom: 24px;">
+            <button id="btn-edit-questions" class="btn secondary" style="font-size: 0.8rem;">
+                <span class="icon">⚙️</span> Personalizar Preguntas
+            </button>
+            <a href="index.html" class="btn secondary" style="font-size: 0.8rem; margin-left: 10px; text-decoration: none;">
+               🏠 Volver al inicio
+            </a>
+        </div>
+
+        <main>
+            <!-- SECCIÓN DE VOTACIÓN -->
+            <div id="voting-section" class="invitation-card-wrapper" style="display: none; max-width: 600px; margin: 0 auto;">
+                <div class="invitation-card" style="width: 100%;">
+                    <div class="invitation-header">
+                        <h3>Categorías a Votar</h3>
+                        <p>Selecciona un invitado para cada una</p>
+                    </div>
+                    <div class="invitation-body" id="questions-container">
+                        <!-- Questions will be injected here -->
+                    </div>
+                    <div class="actions" style="margin-top: 24px;">
+                        <button id="btn-submit-votes" class="btn primary">🔢 Calcular Resultados</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN RESULTADOS / RANKING -->
+            <div id="results-section" class="invitation-card-wrapper" style="display: none; max-width: 600px; margin: 0 auto;">
+                <div class="invitation-card" style="width: 100%;">
+                    <div class="invitation-header">
+                        <h3>Ranking Final</h3>
+                        <span class="badge">Resultados</span>
+                    </div>
+                    <div class="invitation-body">
+                        <ul id="ranking-list" class="ranking-list">
+                            <!-- Ranking injected here -->
+                        </ul>
+                    </div>
+                    <div class="actions" style="margin-top: 24px;">
+                        <button id="btn-restart" class="btn secondary">Volver a Votar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading-state" style="text-align: center; color: #d8b4fe; margin-top: 50px;">
+                Cargando invitados y preguntas...
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL EDITAR PREGUNTAS -->
+    <div id="modal-edit-questions" class="modal-backdrop" style="display: none;">
+        <div class="modal" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <h2>Personalizar Preguntas</h2>
+            <p>Escribe aquí tus 10 categorías o preguntas.</p>
+            <div id="edit-questions-container">
+                <!-- Inputs injected here -->
+            </div>
+            <div class="actions" style="margin-top: 15px;">
+                <button id="btn-save-questions" class="btn primary">Guardar y Continuar</button>
+                <button id="btn-cancel-questions" class="btn secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="votacion.js"></script>
+</body>
+</html>
