@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        if (!sessionStorage.getItem('adminToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euphoria Awards - Control del Juego</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .game-host-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .pin-display {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 20px #c026d3, 0 0 40px #7c3aed;
+            letter-spacing: 15px;
+            margin: 20px 0;
+            font-family: ui-monospace, SFMono-Regular, monospace;
+        }
+        .lobby-qr {
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: inline-block;
+            border: 2px solid rgba(192, 38, 211, 0.5);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+        }
+        .big-question {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #c026d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper game-host-wrapper">
+        <header class="main-header">
+            <h1>Control del Juego</h1>
+            <p class="subtitle" id="status-subtitle">Crea una sesión para empezar a jugar</p>
+        </header>
+
+        <div id="section-create" style="margin-top: 50px;">
+            <div style="margin-bottom: 20px;">
+                <button id="btn-edit-questions" class="btn secondary" style="font-size: 1rem; padding: 10px 20px;">
+                    <span class="icon">⚙️</span> Personalizar Preguntas
+                </button>
+            </div>
+            <button id="btn-create-game" class="btn primary" style="font-size: 1.2rem; padding: 15px 30px;">
+                🎲 Crear Nueva Partida
+            </button>
+        </div>
+
+        <div id="section-lobby" style="display: none;">
+            <h2>Únete en <span style="color:#e879f9;">localhost:3000/juego.html</span></h2>
+            <div class="pin-display" id="lobby-pin">----</div>
+            <div class="lobby-qr">
+                <canvas id="qr-canvas" width="200" height="200"></canvas>
+            </div>
+            <p class="subtitle">Escanea el QR o introduce el PIN</p>
+            <div class="actions" style="margin-top: 30px; justify-content: center;">
+                <button id="btn-start-game" class="btn primary" style="font-size: 1.2rem;">Iniciar Juego ▶</button>
+            </div>
+        </div>
+
+        <div id="section-playing" style="display: none; margin-top: 40px;">
+            <div class="badge" id="question-counter">Pregunta 1 de 10</div>
+            <h2 class="big-question" id="current-question">Cargando pregunta...</h2>
+            
+            <div style="font-size: 1.2rem; color: #d8b4fe; margin-bottom: 30px;">
+                Votos recibidos en tiempo real: <strong id="votes-count" style="color: #fff; font-size: 1.5rem;">0</strong>
+            </div>
+
+            <div class="actions" style="justify-content: center;">
+                <button id="btn-next-question" class="btn primary" style="font-size: 1.1rem;">Siguiente Pregunta ⏭</button>
+                <button id="btn-finish-game" class="btn secondary" style="font-size: 1.1rem; display: none;">Finalizar y ver Ranking 🏆</button>
+            </div>
+        </div>
+
+        <div id="section-results" style="display: none; margin-top: 20px;">
+            <h2 class="big-question">🏆 Ranking Final 🏆</h2>
+            <div class="invitation-card" style="margin: 0 auto; width: 100%; max-width: 600px;">
+                <div class="invitation-body">
+                    <ul id="ranking-list" class="ranking-list">
+                        <!-- Ranking injected here -->
+                    </ul>
+                </div>
+            </div>
+            <div class="actions" style="justify-content: center; margin-top: 30px;">
+                <button id="btn-new-game" class="btn secondary">Nueva Partida</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px;">
+            <a href="admin.html" class="btn link">← Volver al panel admin</a>
+        </div>
+    </div>
+    <!-- MODAL EDITAR PREGUNTAS -->
+    <div id="modal-edit-questions" class="modal-backdrop" style="display: none;">
+        <div class="modal" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <h2>Personalizar Preguntas</h2>
+            <p>Escribe aquí tus categorías o preguntas.</p>
+            <div id="edit-questions-container">
+                <!-- Inputs injected here -->
+            </div>
+            <div class="actions" style="margin-top: 15px;">
+                <button id="btn-save-questions" class="btn primary">Guardar y Continuar</button>
+                <button id="btn-cancel-questions" class="btn secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-juego.js"></script>
+</body>
+</html>

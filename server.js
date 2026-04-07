@@ -17,6 +17,8 @@ const isVercel = !!process.env.VERCEL;
 app.all("/api/admin/login", require('./api/admin/login.js'));
 app.all("/api/invitados", require('./api/invitados.js'));
 app.all("/api/scan", require('./api/scan.js'));
+app.all("/api/preguntas", require('./api/preguntas.js'));
+app.all("/api/game", require('./api/game.js'));
 
 // API para obtener datos de invitado por código original (por si se usa en alguna parte)
 const { supabase } = require('./lib/supabase');
