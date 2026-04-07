@@ -274,6 +274,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`/api/game?action=poll_host&pin=${currentPin}`);
                 const data = await res.json();
                 if (data.ok && data.session) {
+                    
+                    if (data.session.status === 'waiting' && sectionLobby.style.display === 'block') {
+                        if (data.players) {
+                            document.getElementById("players-count").textContent = data.players.length;
+                            const grid = document.getElementById("players-grid");
+                            grid.innerHTML = "";
+                            const uniquePlayers = [...new Set(data.players)];
+                            uniquePlayers.forEach(p => {
+                                const badge = document.createElement("span");
+                                badge.textContent = p;
+                                badge.style.padding = "5px 15px";
+                                badge.style.background = "linear-gradient(45deg, #c026d3, #7c3aed)";
+                                badge.style.color = "#fff";
+                                badge.style.borderRadius = "20px";
+                                badge.style.fontWeight = "bold";
+                                grid.appendChild(badge);
+                            });
+                        }
+                    }
+
                     // Actualizar UI del Admin (por ejemplo conteo de votos de la pregunta actual)
                     if (data.session.status === 'playing' && sectionPlaying.style.display === 'block') {
                          document.getElementById("votes-count").textContent = data.votesCount || 0;
