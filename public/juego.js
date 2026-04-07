@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     loadGuests();
 
-    btnJoin.addEventListener("click", () => {
+    btnJoin.addEventListener("click", async () => {
         const pin = inputPin.value.trim().toUpperCase();
         const name = inputName.value.trim();
         
@@ -117,11 +117,31 @@ document.addEventListener("DOMContentLoaded", () => {
         playerName = name;
 
         // Optionally, check if PIN is valid immediately
-        screenJoin.style.display = "none";
-        screenLobby.style.display = "block";
-        displayName.textContent = playerName;
-
-        startPolling();
+        btnJoin.disabled = true;
+        btnJoin.textContent = "Conectando...";
+        
+        try {
+            const res = await fetch('/api/game', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "join", pin: currentPin, participant_name: playerName })
+            });
+            const data = await res.json();
+            
+            if (data.ok) {
+                screenJoin.style.display = "none";
+                screenLobby.style.display = "block";
+                displayName.textContent = playerName;
+                startPolling();
+            } else {
+                alert("Error al intentar unirse: " + (data.mensaje || "PIN inválido"));
+            }
+        } catch(e) {
+            alert("Error de conexión");
+        } finally {
+            btnJoin.disabled = false;
+            btnJoin.textContent = "Entrar al Juego";
+        }
     });
 
     function showQuestion(qText) {

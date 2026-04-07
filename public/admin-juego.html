@@ -9,6 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Euphoria Awards - Control del Juego</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -69,6 +70,10 @@
                 <canvas id="qr-canvas" width="200" height="200"></canvas>
             </div>
             <p class="subtitle">Escanea el QR o introduce el PIN</p>
+            <div id="lobby-players-container" style="margin-top:20px;">
+                <h3 style="color:#d8b4fe">Participantes unidos (<span id="players-count">0</span>):</h3>
+                <div id="players-grid" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px;"></div>
+            </div>
             <div class="actions" style="margin-top: 30px; justify-content: center;">
                 <button id="btn-start-game" class="btn primary" style="font-size: 1.2rem;">Iniciar Juego ▶</button>
             </div>

@@ -50,6 +50,16 @@ module.exports = async (req, res) => {
             return res.json({ ok: true });
         }
 
+        if (action === "join") {
+            const { pin, participant_name } = body;
+            const { error } = await supabase
+                .from('GameVotes')
+                .insert([{ pin, participant_name, question_index: -1 }]);
+            
+            if (error && error.code !== '23505') throw error; // ignore unique violations if any
+            return res.json({ ok: true });
+        }
+
         if (action === "vote") {
             const { pin, participant_name, question_index, voted_guest_id } = body;
             const { error } = await supabase
@@ -78,6 +88,16 @@ module.exports = async (req, res) => {
             
             if (sErr || !sessionData) return res.json({ ok: false });
 
+            let players = [];
+            if (sessionData.status === 'waiting') {
+                const { data: pData } = await supabase
+                    .from('GameVotes')
+                    .select('participant_name')
+                    .eq('pin', pin)
+                    .eq('question_index', -1);
+                players = pData ? pData.map(p => p.participant_name) : [];
+            }
+
             // Count votes for current question
             const { count, error: countErr } = await supabase
                 .from('GameVotes')
@@ -85,7 +105,7 @@ module.exports = async (req, res) => {
                 .eq('pin', pin)
                 .eq('question_index', sessionData.current_question_index);
             
-            return res.json({ ok: true, session: sessionData, votesCount: count || 0 });
+            return res.json({ ok: true, session: sessionData, votesCount: count || 0, players });
         }
 
         if (action === "poll_player") {
